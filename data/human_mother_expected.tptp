@@ -1,0 +1,13 @@
+fof(exampleExistential, axiom, (
+    ! [H] : ( human(H) =>  ? [M] : hasMother(H, M) )
+  )).
+
+fof(exampleEquality, axiom, (
+    ! [H, M1, M2] : (
+      (hasMother(H, M1) & hasMother(H, M2)) => M1 = M2
+    )
+)).
+
+fof(exampleIntegrity, axiom, (
+    ! [H] : ( hasMother(H, H) => $false )
+  )).
