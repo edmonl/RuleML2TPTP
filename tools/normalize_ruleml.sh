@@ -13,7 +13,7 @@ fi
 
 if [ $o ]
 then
-  java -jar "${selfdir}/saxonHE9-6-0-1j/saxon9he.jar" -xsl:"${selfdir}/101_nafneghornlogeq_normalizer.xslt" -s:"$s" -o:"$o" "$@"
+  java -jar "${selfdir}/saxonhe9-5-1-7/saxon9he.jar" -xsl:"${selfdir}/101_nafneghornlogeq_normalizer.xslt" -s:"$s" -o:"$o" "$@"
 else
-  java -jar "${selfdir}/saxonHE9-6-0-1j/saxon9he.jar" -xsl:"${selfdir}/101_nafneghornlogeq_normalizer.xslt" -s:"$s" "$@"
+  java -jar "${selfdir}/saxonhe9-5-1-7/saxon9he.jar" -xsl:"${selfdir}/101_nafneghornlogeq_normalizer.xslt" -s:"$s" "$@"
 fi

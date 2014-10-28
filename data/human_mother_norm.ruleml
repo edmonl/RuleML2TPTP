@@ -11,24 +11,26 @@
           </declare>
           <formula>
             <Implies material="yes" direction="bidirectional">
-              <Exists>
-                <declare>
-                  <Var>M</Var>
-                </declare>
-                <formula>
-                  <Atom>
-                    <op><Rel>hasMother</Rel></op>
-                    <arg index="1"><Var>H</Var></arg>
-                    <arg index="2"><Var>M</Var></arg>
-                  </Atom>
-                </formula>
-              </Exists>
               <if>
                 <Atom>
                   <op><Rel>human</Rel></op>
                   <arg index="1"><Var>H</Var></arg>
                 </Atom>
               </if>
+              <then>
+                <Exists>
+                  <declare>
+                    <Var>M</Var>
+                  </declare>
+                  <formula>
+                    <Atom>
+                      <op><Rel>hasMother</Rel></op>
+                      <arg index="1"><Var>H</Var></arg>
+                      <arg index="2"><Var>M</Var></arg>
+                    </Atom>
+                  </formula>
+                </Exists>
+              </then>
             </Implies>
           </formula>
         </Forall>
@@ -52,12 +54,6 @@
           </declare>
           <formula>
             <Implies material="yes" direction="bidirectional">
-              <Equal oriented="no">
-                <Var>M2</Var>
-                <left>
-                  <Var>M1</Var>
-                </left>
-              </Equal>
               <if>
                 <And>
                   <formula>
@@ -76,6 +72,16 @@
                   </formula>
                 </And>
               </if>
+              <then>
+                <Equal oriented="no">
+                  <left>
+                    <Var>M1</Var>
+                  </left>
+                  <right>
+                    <Var>M2</Var>
+                  </right>
+                </Equal>
+              </then>
             </Implies>
           </formula>
         </Forall>
@@ -93,7 +99,6 @@
           </declare>
           <formula>
             <Implies material="yes" direction="bidirectional">
-              <Or/>
               <if>
                 <Atom>
                   <op><Rel>hasMother</Rel></op>
@@ -101,6 +106,9 @@
                   <arg index="2"><Var>H</Var></arg>
                 </Atom>
               </if>
+              <then>
+                <Or/>
+              </then>
             </Implies>
           </formula>
         </Forall>
