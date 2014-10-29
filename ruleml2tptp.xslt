@@ -95,17 +95,6 @@
 <!-- Data -->
 <!-- Var = text -->
 
-<xsl:template name="sibling-list">
-  <xsl:param name="element" required="yes"/>
-  <xsl:param name="separator" select="', '" as="xs:string"/>
-  <xsl:for-each select="$element">
-    <xsl:if test="not(. is $element[1])">
-      <xsl:value-of select="$separator"/>
-    </xsl:if>
-    <xsl:apply-templates select="."/>
-  </xsl:for-each>
-</xsl:template>
-
 <!-- And_2 = And { formula_3* } -->
 
 <xsl:template match = "r:And">
@@ -152,5 +141,16 @@
 <!-- formula_4 = formula { Atom | Equal | And_2 | Or_2 } -->
 <!-- formula_7 = formula { Atom | And_3 | Or_3 | Exists_2 } -->
 <!-- formula_8 = formula { Atom | And_3 | Or_3 | Exists_2 } -->
+
+<xsl:template name="sibling-list">
+  <xsl:param name="element" required="yes"/>
+  <xsl:param name="separator" select="', '" as="xs:string"/>
+  <xsl:for-each select="$element">
+    <xsl:if test="not(. is $element[1])">
+      <xsl:value-of select="$separator"/>
+    </xsl:if>
+    <xsl:apply-templates select="."/>
+  </xsl:for-each>
+</xsl:template>
 
 </xsl:stylesheet>
