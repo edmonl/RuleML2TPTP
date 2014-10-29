@@ -32,6 +32,7 @@
 <xsl:template match="r:formula" mode="top">
   <xsl:text>fof(someName, axiom, (</xsl:text>
   <xsl:value-of select="$nl"/>
+  <xsl:text>    </xsl:text>
 
   <xsl:apply-templates/>
   
@@ -77,7 +78,6 @@
   </xsl:call-template>
 
   <xsl:text>] : </xsl:text>
-  <xsl:value-of select="$nl"/>
 
   <xsl:apply-templates select="r:formula"/>
 </xsl:template>
