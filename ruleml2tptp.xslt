@@ -18,7 +18,13 @@
 </xsl:template>
 
 <!-- RuleML = act* -->
+
 <!-- act = (Assert | Retract | Query)* -->
+<xsl:template match="r:act">
+  <xsl:apply-templates>
+    <xsl:with-param name="act-index" select="@index" tunnel="yes"/>
+  </xsl:apply-templates>
+</xsl:template>
 
 <!-- formula* -->
 <xsl:template match="r:Assert">
@@ -30,7 +36,11 @@
 
 <!-- Atom | Equal | Implies | Forall -->
 <xsl:template match="r:formula" mode="top">
-  <xsl:text>fof(someName, axiom, (</xsl:text>
+  <xsl:param name="act-index" required="yes" tunnel="yes"/>
+
+  <xsl:text>fof(</xsl:text>
+  <xsl:value-of select="concat('formula_', $act-index, '_', count(preceding-sibling::*[name() = r:formula]) + 1)"/>
+  <xsl:text>, axiom, (</xsl:text>
   <xsl:value-of select="$nl"/>
   <xsl:text>    </xsl:text>
 
