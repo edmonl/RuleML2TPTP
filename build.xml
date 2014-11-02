@@ -1,17 +1,24 @@
 <project name="RuleML2TPTP" basedir="." default="compile"
   xmlns:if="ant:if" xmlns:unless="ant:unless">
 
+  <echo message="ant.home = ${ant.home}" if:set="ant.home"/>
+  <echo message="ant.java.version = ${ant.java.version}"
+    if:set="ant.java.version"/>
+
   <property name="debug.address" value="localhost:6789"/>
   <property name="debug.suspend" value="n"/>
 
+  <property name="main-class" value="ca.unb.meng.${ant.project.name}"/>
+  <property name="jar.file.basename" value="ruleml2tptp"/>
+
   <property name="src.dir" value="src"/>
+  <property name="resources.dir.name" value="resources"/>
   <property name="build.dir" value="build"/>
   <property name="classes.dir" value="${build.dir}/classes"/>
   <property name="jar.dir" value="${build.dir}/jar"/>
-  <property name="jar.file" value="${jar.dir}/${ant.project.name}.jar"/>
+  <property name="jar.file" value="${jar.dir}/${jar.file.basename}.jar"/>
   <property name="lib.dir.name" value="lib"/>
   <property name="lib.dir" value="${lib.dir.name}"/>
-  <property name="main-class" value="${ant.project.name}"/>
   <property name="doc.dir" value="doc"/>
 
   <path id="lib.classpath">
@@ -67,6 +74,7 @@
       <jvmarg line="${run.jvmargs}" if:set="run.jvmargs"/>
       <classpath>
         <path location="${classes.dir}"/>
+        <path location="${src.dir}"/>
         <path refid="lib.classpath"/>
       </classpath>
       <arg line="${run.args}" if:set="run.args"/>
@@ -83,6 +91,7 @@
       <jvmarg line="${run.jvmargs}" if:set="run.jvmargs"/>
       <classpath>
         <path location="${classes.dir}"/>
+        <path location="${src.dir}"/>
         <path refid="lib.classpath"/>
       </classpath>
       <arg line="${run.args}" if:set="run.args"/>
@@ -103,11 +112,16 @@
       <classpath refid="jar.lib.classpath"/>
     </manifestclasspath>
 
-    <jar destfile="${jar.file}" basedir="${classes.dir}">
+    <jar destfile="${jar.file}">
+      <metainf file="LICENSE"/>
+      <metainf file="NOTICE"/>
       <manifest>
         <attribute name="Main-Class" value="${main-class}"/>
         <attribute name="Class-Path" value="${jar.manifest.classpath}"/>
+        <attribute name="Built-By" value="${user.name}"/>
       </manifest>
+      <fileset dir="${classes.dir}"/>
+      <fileset dir="${src.dir}" includes="${resources.dir.name}/"/>
     </jar>
 
   </target>
