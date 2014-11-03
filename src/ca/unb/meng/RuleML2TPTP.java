@@ -86,6 +86,8 @@ public class RuleML2TPTP {
     private static Options buildOptions() {
         Options options = new Options();
         options.addOption("h", "help", false, "print usage");
+        options.addOption("ne", "no-external-transform-lib", false,
+                "do not use external lib to transform XML");
         options.addOption(OptionBuilder
                 .hasArg()
                 .withArgName("file")
@@ -137,7 +139,13 @@ public class RuleML2TPTP {
         sr = getSourceReader(cmd.getOptionValue('s'));
         ow = getOutputWriter(cmd.getOptionValue('o'));
         try {
-            SAXTransformerFactory tFactory = new TransformerFactoryImpl();
+            SAXTransformerFactory tFactory =  null;
+            if (cmd.hasOption("ne")) {
+                tFactory = (SAXTransformerFactory)SAXTransformerFactory
+                    .newInstance();
+            } else {
+                tFactory = new TransformerFactoryImpl();
+            }
             Templates normalizer = null;
             if (xsltNormalizer != null) {
                 normalizer = tFactory.newTemplates(new StreamSource(
