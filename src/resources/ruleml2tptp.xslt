@@ -23,6 +23,9 @@
   <xsl:apply-templates/>
 </xsl:template>
 
+<!-- Ignore Retract, Data -->
+<xsl:template match="r:Retract | r:Data"/>
+
 <!-- Leaf nodes. -->
 <xsl:template match="r:Rel | r:Var | r:Ind">
   <xsl:value-of select="."/>
@@ -73,7 +76,7 @@
       <xsl:text>axiom</xsl:text>
     </xsl:when>
     <xsl:when test="$formula-source = 'query'">
-      <xsl:text>conjesture</xsl:text>
+      <xsl:text>conjecture</xsl:text>
     </xsl:when>
     <xsl:otherwise>
       <xsl:message terminate="yes">Invalid input.</xsl:message>
