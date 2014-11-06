@@ -31,6 +31,7 @@ import java.util.Properties;
 
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
@@ -48,7 +49,7 @@ public class RuleML2TPTP {
         + "xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>"
         + "<xsl:output method='text'/>"
         + "<xsl:template match='/'>"
-        + "<xsl:text>%nXSLT properties:%n xsl:version = </xsl:text>"
+        + "<xsl:text>XSLT properties:%n xsl:version = </xsl:text>"
         + "<xsl:value-of select=\"system-property('xsl:version')\"/>"
         + "<xsl:text>%n xsl:vendor = </xsl:text>"
         + "<xsl:value-of select=\"system-property('xsl:vendor')\"/>"
@@ -64,6 +65,8 @@ public class RuleML2TPTP {
     private static final int EC_TRANSFORM = 10;
     private static final int EC_FATAL = 127;
 
+    private static SAXTransformerFactory tFactory = null;
+
     public static void main(String[] args) {
         Options options = buildOptions();
         CommandLine cmd = null;
@@ -73,6 +76,18 @@ public class RuleML2TPTP {
             System.err.println(ex.getMessage());
             System.err.println("Try '-h' for usage.");
             System.exit(EC_OPTION);
+        }
+        try {
+            tFactory =
+                (SAXTransformerFactory)SAXTransformerFactory.newInstance();
+        } catch (TransformerFactoryConfigurationError err) {
+            System.err.println("Fatal error: "
+                    + "failed to create the XML transformer factory.");
+            String msg = err.getMessage();
+            if (msg != null) {
+                System.err.println(msg);
+            }
+            System.exit(EC_FATAL);
         }
         if (cmd.hasOption('h')) {
             printUsage(options);
@@ -125,9 +140,10 @@ public class RuleML2TPTP {
                     + "%nIf '-h' is used, "
                     + "nothing will be done except for printing usage."),
                 true);
+        System.out.println();
         StringWriter noteWriter = new StringWriter();
         try {
-            SAXTransformerFactory.newInstance().newTransformer(
+            tFactory.newTransformer(
                     new StreamSource(new StringReader(xsltProperties)))
                 .transform(new StreamSource(new StringReader(xsltProperties)),
                     new StreamResult(noteWriter));
@@ -166,8 +182,6 @@ public class RuleML2TPTP {
         sr = getSourceReader(cmd.getOptionValue('s'));
         ow = getOutputWriter(cmd.getOptionValue('o'));
         try {
-            SAXTransformerFactory tFactory =
-                (SAXTransformerFactory)SAXTransformerFactory.newInstance();
             Templates normalizer = null;
             if (xsltNormalizer != null) {
                 normalizer = tFactory.newTemplates(new StreamSource(
