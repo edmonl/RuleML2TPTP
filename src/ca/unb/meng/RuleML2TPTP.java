@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Properties;
 
@@ -41,6 +43,18 @@ public class RuleML2TPTP {
     private static final String propertiesPath = "/resources/properties";
     private static final String xsltNormalizerPathKey = "xslt.normalizer";
     private static final String xsltTranslatorPathKey = "xslt.translator";
+    private static final String xsltProperties = String.format(
+          "<?xml version='1.0'?><xsl:stylesheet version='1.0' "
+        + "xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>"
+        + "<xsl:output method='text'/>"
+        + "<xsl:template match='/'>"
+        + "<xsl:text>%nXSLT properties:%n xsl:version = </xsl:text>"
+        + "<xsl:value-of select=\"system-property('xsl:version')\"/>"
+        + "<xsl:text>%n xsl:vendor = </xsl:text>"
+        + "<xsl:value-of select=\"system-property('xsl:vendor')\"/>"
+        + "<xsl:text>%n xsl:vendor-url = </xsl:text>"
+        + "<xsl:value-of select=\"system-property('xsl:vendor-url')\"/>"
+        + "</xsl:template></xsl:stylesheet>");
 
     private static final int EC_OPTION = 1;
     private static final int EC_SOURCE = 2;
@@ -86,8 +100,6 @@ public class RuleML2TPTP {
     private static Options buildOptions() {
         Options options = new Options();
         options.addOption("h", "help", false, "print usage");
-        options.addOption("ne", "no-external-transform-lib", false,
-                "do not use external lib to transform XML");
         options.addOption(OptionBuilder
                 .hasArg()
                 .withArgName("file")
@@ -108,11 +120,26 @@ public class RuleML2TPTP {
 
     private static void printUsage(Options options) {
         new HelpFormatter().printHelp("java -jar /path/to/ruleml2tptp.jar",
-                null, options, String.format("If '-s' or '-o' is omitted, "
-                + "the standard input or output will be used accordingly.%n"
-                + "If '-h' is used, "
-                + "nothing will be done except for printing usage."),
+                 null, options, String.format("%nIf '-s' or '-o' is omitted, "
+                    + "the standard input or output will be used accordingly."
+                    + "%nIf '-h' is used, "
+                    + "nothing will be done except for printing usage."),
                 true);
+        StringWriter noteWriter = new StringWriter();
+        try {
+            SAXTransformerFactory.newInstance().newTransformer(
+                    new StreamSource(new StringReader(xsltProperties)))
+                .transform(new StreamSource(new StringReader(xsltProperties)),
+                    new StreamResult(noteWriter));
+        } catch (TransformerException ex) {
+            System.err.println("Error: failed to get XSLT properties.");
+            String msg = ex.getMessageAndLocation();
+            if (msg != null) {
+                System.err.println(msg);
+            }
+        }
+        String note = noteWriter.toString();
+        System.out.println(note);
     }
 
     private InputStream xsltNormalizer = null;
@@ -139,13 +166,8 @@ public class RuleML2TPTP {
         sr = getSourceReader(cmd.getOptionValue('s'));
         ow = getOutputWriter(cmd.getOptionValue('o'));
         try {
-            SAXTransformerFactory tFactory =  null;
-            if (cmd.hasOption("ne")) {
-                tFactory = (SAXTransformerFactory)SAXTransformerFactory
-                    .newInstance();
-            } else {
-                tFactory = new TransformerFactoryImpl();
-            }
+            SAXTransformerFactory tFactory =
+                (SAXTransformerFactory)SAXTransformerFactory.newInstance();
             Templates normalizer = null;
             if (xsltNormalizer != null) {
                 normalizer = tFactory.newTemplates(new StreamSource(
