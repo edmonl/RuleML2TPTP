@@ -145,20 +145,20 @@
 
 <!-- Equal = left, right -->
 <xsl:template match="r:Equal">
-  <xsl:text>(</xsl:text>
+  <xsl:text>( </xsl:text>
   <xsl:apply-templates select="r:left"/>
   <xsl:text> = </xsl:text>
   <xsl:apply-templates select="r:right"/>
-  <xsl:text>)</xsl:text>
+  <xsl:text> )</xsl:text>
 </xsl:template>
 
 <!-- Implies = if, then -->
 <xsl:template match="r:Implies">
-  <xsl:text>(</xsl:text>
+  <xsl:text>( </xsl:text>
   <xsl:apply-templates select="r:if"/>
   <xsl:text> => </xsl:text>
   <xsl:apply-templates select="r:then"/>
-  <xsl:text>)</xsl:text>
+  <xsl:text> )</xsl:text>
 </xsl:template>
 
 <!-- Forall = declare+, formula -->
@@ -173,14 +173,14 @@
 <xsl:template match = "r:And">
   <xsl:choose>
     <xsl:when test="r:formula">
-      <xsl:text>(</xsl:text>
+      <xsl:text>( </xsl:text>
       <xsl:for-each select="r:formula">
         <xsl:if test="preceding-sibling::r:formula">
           <xsl:text> &amp; </xsl:text>
         </xsl:if>
         <xsl:apply-templates/>
       </xsl:for-each>
-      <xsl:text>)</xsl:text>
+      <xsl:text> )</xsl:text>
     </xsl:when>
     <xsl:otherwise>
       <xsl:text>$true</xsl:text>
@@ -192,14 +192,14 @@
 <xsl:template match = "r:Or">
   <xsl:choose>
     <xsl:when test="r:formula">
-      <xsl:text>(</xsl:text>
+      <xsl:text>( </xsl:text>
       <xsl:for-each select="r:formula">
         <xsl:if test="preceding-sibling::r:formula">
           <xsl:text> | </xsl:text>
         </xsl:if>
         <xsl:apply-templates/>
       </xsl:for-each>
-      <xsl:text>)</xsl:text>
+      <xsl:text> )</xsl:text>
     </xsl:when>
     <xsl:otherwise>
       <xsl:text>$false</xsl:text>
