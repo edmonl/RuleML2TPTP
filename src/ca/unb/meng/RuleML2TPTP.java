@@ -29,6 +29,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Properties;
 
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -181,34 +183,28 @@ public class RuleML2TPTP {
         loadXslt(!cmd.hasOption("nn"), !cmd.hasOption("nt"));
         sr = getSourceReader(cmd.getOptionValue('s'));
         ow = getOutputWriter(cmd.getOptionValue('o'));
+        Source source = new StreamSource(sr);
+        Result result = new StreamResult(ow);
         try {
-            Templates normalizer = null;
-            if (xsltNormalizer != null) {
-                normalizer = tFactory.newTemplates(new StreamSource(
-                            new BufferedReader(new InputStreamReader(
-                                    xsltNormalizer))));
-            }
-            Templates translator = null;
-            if (xsltTranslator != null) {
-                translator = tFactory.newTemplates(new StreamSource(
-                            new BufferedReader(new InputStreamReader(
-                                    xsltTranslator))));
-            }
-            if (normalizer == null) {
-                Transformer tf = translator.newTransformer();
-                tf.transform(new StreamSource(sr), new StreamResult(ow));
-            } else if (translator == null) {
-                Transformer tf = normalizer.newTransformer();
-                tf.transform(new StreamSource(sr), new StreamResult(ow));
+            if (xsltNormalizer == null) {
+                assert xsltTranslator != null;
+                tFactory.newTransformer(new StreamSource(new BufferedReader(
+                                new InputStreamReader(xsltTranslator))))
+                    .transform(source, result);
+            } else if (xsltTranslator == null) {
+                assert xsltNormalizer != null;
+                tFactory.newTransformer(new StreamSource(new BufferedReader(
+                                new InputStreamReader(xsltNormalizer))))
+                    .transform(source, result);
             } else {
-                TransformerHandler nh =
-                    tFactory.newTransformerHandler(normalizer);
-                TransformerHandler th =
-                    tFactory.newTransformerHandler(translator);
-                nh.setResult(new SAXResult(th));
-                th.setResult(new StreamResult(ow));
-                Transformer tf = tFactory.newTransformer();
-                tf.transform(new StreamSource(sr), new SAXResult(nh));
+                TransformerHandler th = tFactory.newTransformerHandler(
+                        tFactory.newTemplates(new StreamSource(
+                                new BufferedReader(new InputStreamReader(
+                                        xsltTranslator)))));
+                th.setResult(result);
+                tFactory.newTransformer(new StreamSource(new BufferedReader(
+                                new InputStreamReader(xsltNormalizer))))
+                    .transform(source, new SAXResult(th));
             }
         } catch (TransformerConfigurationException ex) {
             ec = EC_FATAL;
