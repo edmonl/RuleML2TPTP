@@ -13,6 +13,21 @@
 <xsl:variable name="nl" as="xs:string"><xsl:text>
 </xsl:text></xsl:variable>
 
+<!-- Indent. -->
+<xsl:template name="break-line">
+  <xsl:param name="depth" required="yes" as="xs:integer"/>
+  <xsl:param name="retreat" select="0" required="no" as="xs:integer"/>
+
+  <xsl:variable name="indent" as="xs:string *">
+    <xsl:for-each select="1 to $depth">
+      <xsl:text>  </xsl:text>
+    </xsl:for-each>
+  </xsl:variable>
+  <xsl:value-of select="$nl"/>
+  <xsl:value-of select="substring(string-join($indent, ''), $retreat + 1)"/>
+
+</xsl:template>
+
 <!-- The root. -->
 <xsl:template match="/">
   <xsl:apply-templates select="r:RuleML"/>
@@ -83,16 +98,14 @@
 <!-- Assert = formula* -->
 <xsl:template match="r:Assert">
   <xsl:apply-templates select="r:formula" mode="top">
-    <xsl:with-param name="formula-source" select="lower-case(local-name())"
-      as="xs:string"/>
+    <xsl:with-param name="formula-source" select="lower-case(local-name())"/>
   </xsl:apply-templates>
 </xsl:template>
 
 <!-- Query = formula* -->
 <xsl:template match="r:Query">
   <xsl:apply-templates select="r:formula" mode="top">
-    <xsl:with-param name="formula-source" select="lower-case(local-name())"
-      as="xs:string"/>
+    <xsl:with-param name="formula-source" select="lower-case(local-name())"/>
   </xsl:apply-templates>
 </xsl:template>
 
@@ -101,7 +114,7 @@
   <xsl:param name="act-index" required="yes" tunnel="yes"/>
   <xsl:param name="formula-source" required="yes" as="xs:string"/>
   <!-- Indentation. -->
-  <xsl:variable name="indent" select="'    '" as="xs:string"/>
+  <xsl:variable name="depth" select="2" as="xs:integer"/>
 
   <xsl:text>fof(</xsl:text>
   <!-- Formula name. -->
@@ -123,16 +136,15 @@
   </xsl:choose>
 
   <xsl:text>, (</xsl:text>
-  <xsl:value-of select="$nl"/>
-  <xsl:value-of select="$indent"/>
+  <xsl:call-template name="break-line">
+    <xsl:with-param name="depth" select="$depth"/>
+  </xsl:call-template>
 
   <xsl:apply-templates>
-    <xsl:with-param name="indent" select="$indent"
-      as="xs:string" tunnel="yes"/>
+    <xsl:with-param name="depth" select="$depth" tunnel="yes"/>
     <!-- This param indicates if the children can break the line at the very
          beginning. -->
-    <xsl:with-param name="linebreaking" select="false()"
-      as="xs:boolean" tunnel="yes"/>
+    <xsl:with-param name="linebreaking" select="false()" tunnel="yes"/>
   </xsl:apply-templates>
   
   <xsl:value-of select="$nl"/>
@@ -163,32 +175,30 @@
 
 <!-- Implies = if, then -->
 <xsl:template match="r:Implies">
-  <xsl:param name="indent" required="yes" as="xs:string" tunnel="yes"/>
+  <xsl:param name="depth" required="yes" as="xs:integer" tunnel="yes"/>
   <xsl:param name="linebreaking" required="yes" as="xs:boolean" tunnel="yes"/>
-  <xsl:variable name="next-indent" select="concat($indent, '  ')" as="xs:string"/>
 
   <xsl:if test="$linebreaking">
-    <xsl:value-of select="$nl"/>
-    <xsl:value-of select="$indent"/>
+    <xsl:call-template name="break-line">
+      <xsl:with-param name="depth" select="$depth"/>
+    </xsl:call-template>
   </xsl:if>
   <xsl:text>( </xsl:text>
 
   <xsl:apply-templates select="r:if">
-    <xsl:with-param name="indent" select="$next-indent"
-      as="xs:string" tunnel="yes"/>
-    <xsl:with-param name="linebreaking" select="false()"
-      as="xs:boolean" tunnel="yes"/>
+    <xsl:with-param name="depth" select="$depth + 1" tunnel="yes"/>
+    <xsl:with-param name="linebreaking" select="false()" tunnel="yes"/>
   </xsl:apply-templates>
 
-  <xsl:value-of select="$nl"/>
-  <xsl:value-of select="substring($indent, 2)"/>
+  <xsl:call-template name="break-line">
+    <xsl:with-param name="depth" select="$depth"/>
+    <xsl:with-param name="retreat" select="1"/>
+  </xsl:call-template>
   <xsl:text>=> </xsl:text>
 
   <xsl:apply-templates select="r:then">
-    <xsl:with-param name="indent" select="$next-indent"
-      as="xs:string" tunnel="yes"/>
-    <xsl:with-param name="linebreaking" select="false()"
-      as="xs:boolean" tunnel="yes"/>
+    <xsl:with-param name="depth" select="$depth + 1" tunnel="yes"/>
+    <xsl:with-param name="linebreaking" select="false()" tunnel="yes"/>
   </xsl:apply-templates>
 
   <xsl:text> )</xsl:text>
@@ -197,52 +207,49 @@
 
 <!-- Forall = declare+, formula -->
 <xsl:template match="r:Forall">
-  <xsl:param name="indent" required="yes" as="xs:string" tunnel="yes"/>
+  <xsl:param name="depth" required="yes" as="xs:integer" tunnel="yes"/>
   <xsl:param name="linebreaking" required="yes" as="xs:boolean" tunnel="yes"/>
-  <xsl:variable name="next-indent" select="concat($indent, '  ')" as="xs:string"/>
 
   <xsl:if test="$linebreaking">
-    <xsl:value-of select="$nl"/>
-    <xsl:value-of select="$indent"/>
+    <xsl:call-template name="break-line">
+      <xsl:with-param name="depth" select="$depth"/>
+    </xsl:call-template>
   </xsl:if>
   <xsl:text>! [</xsl:text>
   <xsl:call-template name="declare-list"/>
   <xsl:text>] : </xsl:text>
 
   <xsl:apply-templates select="r:formula">
-    <xsl:with-param name="indent" select="$next-indent"
-      as="xs:string" tunnel="yes"/>
-    <xsl:with-param name="linebreaking" select="true()"
-      as="xs:boolean" tunnel="yes"/>
+    <xsl:with-param name="depth" select="$depth + 1" tunnel="yes"/>
+    <xsl:with-param name="linebreaking" select="true()" tunnel="yes"/>
   </xsl:apply-templates>
 
 </xsl:template>
 
 <!-- And = formula* -->
 <xsl:template match = "r:And">
-  <xsl:param name="indent" required="yes" as="xs:string" tunnel="yes"/>
+  <xsl:param name="depth" required="yes" as="xs:integer" tunnel="yes"/>
   <xsl:param name="linebreaking" required="yes" as="xs:boolean" tunnel="yes"/>
-  <xsl:variable name="next-indent" select="concat($indent, '  ')" as="xs:string"/>
 
   <xsl:choose>
     <xsl:when test="r:formula">
       <xsl:if test="$linebreaking">
-        <xsl:value-of select="$nl"/>
-        <xsl:value-of select="$indent"/>
+        <xsl:call-template name="break-line">
+          <xsl:with-param name="depth" select="$depth"/>
+        </xsl:call-template>
       </xsl:if>
 
       <xsl:text>( </xsl:text>
       <xsl:for-each select="r:formula">
         <xsl:if test="preceding-sibling::r:formula">
-          <xsl:value-of select="$nl"/>
-          <xsl:value-of select="$indent"/>
+          <xsl:call-template name="break-line">
+            <xsl:with-param name="depth" select="$depth"/>
+          </xsl:call-template>
           <xsl:text>&amp; </xsl:text>
         </xsl:if>
         <xsl:apply-templates>
-          <xsl:with-param name="indent" select="$next-indent"
-            as="xs:string" tunnel="yes"/>
-          <xsl:with-param name="linebreaking" select="false()"
-            as="xs:boolean" tunnel="yes"/>
+          <xsl:with-param name="depth" select="$depth + 1" tunnel="yes"/>
+          <xsl:with-param name="linebreaking" select="false()" tunnel="yes"/>
         </xsl:apply-templates>
       </xsl:for-each>
       <xsl:text> )</xsl:text>
@@ -256,29 +263,28 @@
 
 <!-- Or = formula* -->
 <xsl:template match = "r:Or">
-  <xsl:param name="indent" required="yes" as="xs:string" tunnel="yes"/>
+  <xsl:param name="depth" required="yes" as="xs:integer" tunnel="yes"/>
   <xsl:param name="linebreaking" required="yes" as="xs:boolean" tunnel="yes"/>
-  <xsl:variable name="next-indent" select="concat($indent, '  ')" as="xs:string"/>
 
   <xsl:choose>
     <xsl:when test="r:formula">
       <xsl:if test="$linebreaking">
-        <xsl:value-of select="$nl"/>
-        <xsl:value-of select="$indent"/>
+        <xsl:call-template name="break-line">
+          <xsl:with-param name="depth" select="$depth"/>
+        </xsl:call-template>
       </xsl:if>
 
       <xsl:text>( </xsl:text>
       <xsl:for-each select="r:formula">
         <xsl:if test="preceding-sibling::r:formula">
-          <xsl:value-of select="$nl"/>
-          <xsl:value-of select="$indent"/>
+          <xsl:call-template name="break-line">
+            <xsl:with-param name="depth" select="$depth"/>
+          </xsl:call-template>
           <xsl:text>| </xsl:text>
         </xsl:if>
         <xsl:apply-templates>
-          <xsl:with-param name="indent" select="$next-indent"
-            as="xs:string" tunnel="yes"/>
-          <xsl:with-param name="linebreaking" select="false()"
-            as="xs:boolean" tunnel="yes"/>
+          <xsl:with-param name="depth" select="$depth + 1" tunnel="yes"/>
+          <xsl:with-param name="linebreaking" select="false()" tunnel="yes"/>
         </xsl:apply-templates>
       </xsl:for-each>
       <xsl:text> )</xsl:text>
@@ -292,23 +298,21 @@
 
 <!-- Exists = declare+, formula -->
 <xsl:template match="r:Exists">
-  <xsl:param name="indent" required="yes" as="xs:string" tunnel="yes"/>
+  <xsl:param name="depth" required="yes" as="xs:integer" tunnel="yes"/>
   <xsl:param name="linebreaking" required="yes" as="xs:boolean" tunnel="yes"/>
-  <xsl:variable name="next-indent" select="concat($indent, '  ')" as="xs:string"/>
 
   <xsl:if test="$linebreaking">
-    <xsl:value-of select="$nl"/>
-    <xsl:value-of select="$indent"/>
+    <xsl:call-template name="break-line">
+      <xsl:with-param name="depth" select="$depth"/>
+    </xsl:call-template>
   </xsl:if>
   <xsl:text>? [</xsl:text>
   <xsl:call-template name="declare-list"/>
   <xsl:text>] : </xsl:text>
 
   <xsl:apply-templates select="r:formula">
-    <xsl:with-param name="indent" select="$next-indent"
-      as="xs:string" tunnel="yes"/>
-    <xsl:with-param name="linebreaking" select="true()"
-      as="xs:boolean" tunnel="yes"/>
+    <xsl:with-param name="depth" select="$depth + 1" tunnel="yes"/>
+    <xsl:with-param name="linebreaking" select="true()" tunnel="yes"/>
   </xsl:apply-templates>
 </xsl:template>
 
