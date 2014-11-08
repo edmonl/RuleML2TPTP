@@ -10,8 +10,6 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import net.sf.saxon.TransformerFactoryImpl;
-
 import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,9 +31,10 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
@@ -79,15 +78,26 @@ public class RuleML2TPTP {
             System.err.println("Try '-h' for usage.");
             System.exit(EC_OPTION);
         }
+        String factoryClassName = cmd.getOptionValue('t');
         try {
-            tFactory =
-                (SAXTransformerFactory)SAXTransformerFactory.newInstance();
+            if (factoryClassName == null) {
+                tFactory = (SAXTransformerFactory)(SAXTransformerFactory
+                        .newInstance());
+            } else {
+                tFactory = (SAXTransformerFactory)(TransformerFactory
+                        .newInstance(factoryClassName,
+                            RuleML2TPTP.class.getClassLoader()));
+            }
         } catch (TransformerFactoryConfigurationError err) {
             System.err.println("Fatal error: "
                     + "failed to create the XML transformer factory.");
             String msg = err.getMessage();
             if (msg != null) {
                 System.err.println(msg);
+            }
+            Exception ex = err.getException();
+            if (ex != null && ex.getMessage() != null) {
+                System.err.println(ex.getMessage());
             }
             System.exit(EC_FATAL);
         }
@@ -117,6 +127,17 @@ public class RuleML2TPTP {
     private static Options buildOptions() {
         Options options = new Options();
         options.addOption("h", "help", false, "print usage");
+        options.addOptionGroup(new OptionGroup()
+                .addOption(new Option("nn", "no-normalization",
+                        false, "take source as normalized"))
+                .addOption(new Option("nt", "no-translation", false,
+                        "only normalize source and output")));
+        options.addOption(OptionBuilder
+                .hasArg()
+                .withArgName("class")
+                .withDescription("use given factory class")
+                .withLongOpt("transformer-factory")
+                .create('t'));
         options.addOption(OptionBuilder
                 .hasArg()
                 .withArgName("file")
@@ -127,20 +148,15 @@ public class RuleML2TPTP {
                 .withArgName("file")
                 .withDescription("use given output file")
                 .create('o'));
-        options.addOptionGroup(new OptionGroup()
-                .addOption(new Option("nn", "no-normalization",
-                        false, "take source as normalized"))
-                .addOption(new Option("nt", "no-translation", false,
-                        "only normalize source and output")));
         return options;
     }
 
     private static void printUsage(Options options) {
-        new HelpFormatter().printHelp("java -jar /path/to/ruleml2tptp.jar",
+        new HelpFormatter().printHelp("java -jar ruleml2tptp.jar",
                  null, options, String.format("%nIf '-s' or '-o' is omitted, "
                     + "the standard input or output will be used accordingly."
                     + "%nIf '-h' is used, "
-                    + "nothing will be done except for printing usage."),
+                    + "no XML transformation will be performed."),
                 true);
         System.out.println();
         StringWriter noteWriter = new StringWriter();
