@@ -1,4 +1,4 @@
-<project name="RuleML2TPTP" basedir="." default="compile"
+<project name="RuleML2TPTP" basedir="." default="jar"
   xmlns:if="ant:if" xmlns:unless="ant:unless">
 
   <echo message="ant.home = ${ant.home}" if:set="ant.home"/>
