@@ -5,13 +5,37 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:r="http://ruleml.org/spec">
 
+<!-- The regular expression to match against comments. -->
+<xsl:param name="match-comments" select="'.*'" as="xs:string" required="no"/>
+<!-- The flags when matching against comments. -->
+<xsl:param name="matching-flags" select="''" as="xs:string" required="no"/>
+<!-- Keep or skip matched comments. -->
+<xsl:param name="keep-comments" select="false()" as="xs:boolean" required="no"/>
+
 <xsl:output method="text"/>
 <!-- We have to do the format ourselves. -->
 <xsl:strip-space elements="*"/>
 
+<!-- Comments. -->
+<xsl:template match="comment()" mode="#all">
+  <xsl:if test="matches(., $match-comments, $matching-flags) = $keep-comments">
+    <xsl:variable name="step-1"
+      select="replace(., '(^[ \t]+)|([ \t]+$)', '', 'm')"/>
+    <xsl:variable name="step-2"
+      select="replace($step-1, '^-- ', '% ', 'm')"/>
+    <xsl:variable name="step-3"
+      select="replace($step-2, '^(-+)$', '%$1', 'm')"/>
+    <xsl:variable name="final"
+      select="replace($step-3, '^([^%\r\n].*)$', '% $1', 'm')"/>
+    <xsl:value-of select="$final"/>
+    <xsl:if test="not(matches($final, '\n$'))">
+      <xsl:value-of select="$nl"/>
+    </xsl:if>
+  </xsl:if>
+</xsl:template>
+
 <!-- Line break.  -->
-<xsl:variable name="nl" as="xs:string"><xsl:text>
-</xsl:text></xsl:variable>
+<xsl:variable name="nl" select="'&#xA;'" as="xs:string"/>
 
 <!-- Indent. -->
 <xsl:template name="break-line">
@@ -30,7 +54,7 @@
 
 <!-- The root. -->
 <xsl:template match="/">
-  <xsl:apply-templates select="r:RuleML"/>
+  <xsl:apply-templates select="r:RuleML | comment()"/>
 </xsl:template>
 
 <!-- Universal templates for trivial nodes. -->
@@ -84,27 +108,27 @@
 
 <!-- RuleML = act* -->
 <xsl:template match="r:RuleML">
-  <xsl:apply-templates select="r:act"/>
+  <xsl:apply-templates select="r:act | comment()"/>
 </xsl:template>
 
 <!-- Retract is ignored. -->
 <!-- act = Assert | Query -->
 <xsl:template match="r:act">
-  <xsl:apply-templates select="r:Assert | r:Query">
+  <xsl:apply-templates select="r:Assert | r:Query | comment()">
     <xsl:with-param name="act-index" select="@index" tunnel="yes"/>
   </xsl:apply-templates>
 </xsl:template>
 
 <!-- Assert = formula* -->
 <xsl:template match="r:Assert">
-  <xsl:apply-templates select="r:formula" mode="top">
+  <xsl:apply-templates select="r:formula | comment()" mode="top">
     <xsl:with-param name="formula-source" select="lower-case(local-name())"/>
   </xsl:apply-templates>
 </xsl:template>
 
 <!-- Query = formula* -->
 <xsl:template match="r:Query">
-  <xsl:apply-templates select="r:formula" mode="top">
+  <xsl:apply-templates select="r:formula | comment()" mode="top">
     <xsl:with-param name="formula-source" select="lower-case(local-name())"/>
   </xsl:apply-templates>
 </xsl:template>

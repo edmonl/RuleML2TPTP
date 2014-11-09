@@ -50,11 +50,11 @@ public class RuleML2TPTP {
         + "xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>"
         + "<xsl:output method='text'/>"
         + "<xsl:template match='/'>"
-        + "<xsl:text>XSLT properties:%n xsl:version = </xsl:text>"
+        + "<xsl:text>XSLT PROPERTIES%nxsl:version = </xsl:text>"
         + "<xsl:value-of select=\"system-property('xsl:version')\"/>"
-        + "<xsl:text>%n xsl:vendor = </xsl:text>"
+        + "<xsl:text>%nxsl:vendor = </xsl:text>"
         + "<xsl:value-of select=\"system-property('xsl:vendor')\"/>"
-        + "<xsl:text>%n xsl:vendor-url = </xsl:text>"
+        + "<xsl:text>%nxsl:vendor-url = </xsl:text>"
         + "<xsl:value-of select=\"system-property('xsl:vendor-url')\"/>"
         + "</xsl:template></xsl:stylesheet>");
 
@@ -113,6 +113,8 @@ public class RuleML2TPTP {
             if (msg != null) {
                 System.err.println(msg);
             }
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception ex) {
             String msg = ex.getMessage();
             if (msg != null) {
@@ -139,6 +141,20 @@ public class RuleML2TPTP {
                 .withLongOpt("transformer-factory")
                 .create('t'));
         options.addOption(OptionBuilder
+                .hasOptionalArg()
+                .withArgName("pattern")
+                .withDescription("keep comments matching given pattern "
+                   + "or any pattern if pattern is omitted or empty")
+                .withLongOpt("keep-comments")
+                .create('c'));
+        options.addOption(OptionBuilder
+                .hasArg()
+                .withArgName("flags")
+                .withDescription("flags following the specification of XPath "
+                    + "except for flag v (see NOTES below)")
+                .withLongOpt("matching-flags")
+                .create('g'));
+        options.addOption(OptionBuilder
                 .hasArg()
                 .withArgName("file")
                 .withDescription("use given source file")
@@ -153,10 +169,14 @@ public class RuleML2TPTP {
 
     private static void printUsage(Options options) {
         new HelpFormatter().printHelp("java -jar ruleml2tptp.jar",
-                 null, options, String.format("%nIf '-s' or '-o' is omitted, "
-                    + "the standard input or output will be used accordingly."
-                    + "%nIf '-h' is used, "
-                    + "no XML transformation will be performed."),
+                 null, options, String.format("%nNOTES%n"
+                    + "If '-s' or '-o' is omitted, the standard input or "
+                    + "output will be used accordingly.%n"
+                    + "If '-h' is used, "
+                    + "no XML transformation will be performed.%n"
+                    + "Flag v means the matching behavior is reverted, "
+                    + "so comments DO NOT match the given pattern are kept. "
+                    ),
                 true);
         System.out.println();
         StringWriter noteWriter = new StringWriter();
@@ -194,33 +214,62 @@ public class RuleML2TPTP {
         close(ow);
     }
 
-    public void run(CommandLine cmd) throws FileNotFoundException,
-           IOException, TransformerException {
+    public void run(CommandLine cmd) throws FileNotFoundException, IOException,
+           TransformerException, TransformerConfigurationException {
         loadXslt(!cmd.hasOption("nn"), !cmd.hasOption("nt"));
         sr = getSourceReader(cmd.getOptionValue('s'));
         ow = getOutputWriter(cmd.getOptionValue('o'));
         Source source = new StreamSource(sr);
         Result result = new StreamResult(ow);
         try {
-            if (xsltNormalizer == null) {
-                assert xsltTranslator != null;
-                tFactory.newTransformer(new StreamSource(new BufferedReader(
-                                new InputStreamReader(xsltTranslator))))
-                    .transform(source, result);
-            } else if (xsltTranslator == null) {
+            if (xsltTranslator == null) {
                 assert xsltNormalizer != null;
                 tFactory.newTransformer(new StreamSource(new BufferedReader(
                                 new InputStreamReader(xsltNormalizer))))
                     .transform(source, result);
             } else {
-                TransformerHandler th = tFactory.newTransformerHandler(
-                        tFactory.newTemplates(new StreamSource(
-                                new BufferedReader(new InputStreamReader(
-                                        xsltTranslator)))));
-                th.setResult(result);
-                tFactory.newTransformer(new StreamSource(new BufferedReader(
-                                new InputStreamReader(xsltNormalizer))))
-                    .transform(source, new SAXResult(th));
+                String commentPattern = cmd.getOptionValue('c');
+                String matchingFlags = cmd.getOptionValue('g');
+                if (matchingFlags == null) {
+                    matchingFlags = "";
+                }
+                boolean keepComments = cmd.hasOption('c')
+                    && (matchingFlags.indexOf('v') == -1);
+                matchingFlags = matchingFlags.replaceAll("v", "");
+                if (xsltNormalizer == null) {
+                    Transformer translator = tFactory.newTransformer(
+                            new StreamSource(new BufferedReader(
+                                    new InputStreamReader(xsltTranslator))));
+                    if (commentPattern != null && !commentPattern.isEmpty()) {
+                        translator.setParameter(
+                                "match-comments", commentPattern);
+                    }
+                    if (!matchingFlags.isEmpty()) {
+                        translator.setParameter(
+                                "matching-flags", matchingFlags);
+                    }
+                    translator.setParameter("keep-comments", keepComments);
+                    translator.transform(source, result);
+                } else {
+                    TransformerHandler th = tFactory.newTransformerHandler(
+                            tFactory.newTemplates(new StreamSource(
+                                    new BufferedReader(new InputStreamReader(
+                                            xsltTranslator)))));
+                    th.setResult(result);
+                    Transformer translator = th.getTransformer();
+                    if (commentPattern != null && !commentPattern.isEmpty()) {
+                        translator.setParameter(
+                                "match-comments", commentPattern);
+                    }
+                    if (!matchingFlags.isEmpty()) {
+                        translator.setParameter(
+                                "matching-flags", matchingFlags);
+                    }
+                    translator.setParameter("keep-comments", keepComments);
+                    tFactory.newTransformer(new StreamSource(new BufferedReader(
+                                    new InputStreamReader(xsltNormalizer))))
+                        .transform(source, new SAXResult(th));
+                }
             }
         } catch (TransformerConfigurationException ex) {
             ec = EC_FATAL;
@@ -232,7 +281,8 @@ public class RuleML2TPTP {
     }
 
     private void loadXslt(boolean doNormalization,
-            boolean doTranslation) throws FileNotFoundException, IOException {
+            boolean doTranslation) throws FileNotFoundException,
+            IOException, TransformerConfigurationException {
         assert doNormalization || doTranslation;
         if (doNormalization) {
             try {
@@ -252,8 +302,8 @@ public class RuleML2TPTP {
         }
     }
 
-    private InputStream loadXslt(
-            String key) throws FileNotFoundException, IOException {
+    private InputStream loadXslt(String key) throws FileNotFoundException,
+            IOException, TransformerConfigurationException {
         InputStream result = null;
         String path = System.getProperty(key);
         if (path != null) {
@@ -274,13 +324,14 @@ public class RuleML2TPTP {
             if (result == null) {
                 System.err.println("Fatal error: failed to find " + key + ".");
                 ec = EC_FATAL;
-                throw new IllegalStateException();
+                throw new TransformerConfigurationException();
             }
         }
         return result;
     }
 
-    private void loadProperties() throws IOException {
+    private void loadProperties() throws IOException,
+            TransformerConfigurationException {
         if (properties != null) {
             return;
         }
@@ -290,7 +341,7 @@ public class RuleML2TPTP {
             System.err.println(
                     "Fatal error: failed to load application properties.");
             ec = EC_FATAL;
-            throw new IllegalStateException();
+            throw new TransformerConfigurationException();
         }
         try (Reader pr = new BufferedReader(new InputStreamReader(res))) {
             properties.load(pr);
