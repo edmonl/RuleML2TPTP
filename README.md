@@ -22,7 +22,7 @@ This project was initiated as a course project in [UNB](http://www.unb.ca). Than
 
 ### RuleML Examples
 
-Here are some good RuleML examples to try with this project from [RuleML wiki](http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML_1.01#Examples) or [here](http://deliberation.ruleml.org/1.01/exa/DatalogPlus/).
+Here are some good RuleML examples from [RuleML wiki](http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML_1.01#Examples) or [here](http://deliberation.ruleml.org/1.01/exa/DatalogPlus/) to try with this project.
 
 ### License
 
