@@ -14,3 +14,6 @@ This project is aimed at implementing an XSLT 2.0 translator to convert [Datalog
 3. Execute by calling "java -jar /path/to/ruleml2tptp.jar -s <source RuleML file> -o <output filename>". See "java -jar /path/to/ruleml2tptp.jar -h" for full usage.
 4. Java SE 7 or higher is recommended.
 5. Saxon is used but dynamically, so saxon.jar can be removed and the local JAXP implementation will be used. Make sure, however, that the local implementation supports XSLT 2.0, or things will go wrong.
+
+### RuleML examples
+Get RuleML examples from [RuleML wiki](http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML_1.01#Examples) or [here](http://deliberation.ruleml.org/1.01/exa/DatalogPlus/).
