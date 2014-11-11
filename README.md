@@ -21,4 +21,9 @@ This project was initiated as a course project in [UNB](http://www.unb.ca). Than
 6. See the [project wiki](https://github.com/EdmonL/RuleML2TPTP/wiki) for the other documentation.
 
 ### RuleML Examples
+
 Here are some good RuleML examples to try with this project from [RuleML wiki](http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML_1.01#Examples) or [here](http://deliberation.ruleml.org/1.01/exa/DatalogPlus/).
+
+### License
+
+This project is under [GNU GPL v3.0](https://github.com/EdmonL/RuleML2TPTP/blob/master/LICENSE).
