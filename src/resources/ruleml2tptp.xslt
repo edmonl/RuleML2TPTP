@@ -83,7 +83,7 @@
     </xsl:when>
     <xsl:otherwise>
       <!-- Give warning. -->
-      <xsl:if test="not(matches(text(), '^[#x20-#x7E]+$'))">
+      <xsl:if test="not(matches(text(), '^[&#x20;-&#x7E;]+$'))">
         <xsl:message terminate="no">
           <xsl:text>The format of functor/constant '</xsl:text>
           <xsl:value-of select="text()"/>
@@ -91,8 +91,8 @@
         </xsl:message>
       </xsl:if>
       <!-- Escape \ and ' firstly. -->
-      <xsl:value-of select='concat(&quot;&apos;&quot;,
-        replace(replace(text(), "\", "\\"), "&apos;", "\&apos;"), &quot;&apos;&quot;)'/>
+      <xsl:value-of select='concat("&apos;",
+        replace(replace(text(), "\\", "\\\\"), "&apos;", "\\&apos;"), "&apos;")'/>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
