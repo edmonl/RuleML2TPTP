@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="RuleML2TPTP : This project is aimed at implementing an XSLT 2.0 translator to convert Datalog+ Deliberation RuleML 1.01 in XML format to an equivalent representation in a subset of the TPTP (Thousands of Problems for Theorem Provers) format.">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>RuleML2TPTP</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/EdmonL/RuleML2TPTP">View on GitHub</a>
+
+          <h1 id="project_title">RuleML2TPTP</h1>
+          <h2 id="project_tagline">This project is aimed at implementing an XSLT 2.0 translator to convert Datalog+ Deliberation RuleML 1.01 in XML format to an equivalent representation in a subset of the TPTP (Thousands of Problems for Theorem Provers) format.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/EdmonL/RuleML2TPTP/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/EdmonL/RuleML2TPTP/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="ruleml2tptp" class="anchor" href="#ruleml2tptp" aria-hidden="true"><span class="octicon octicon-link"></span></a>RuleML2TPTP</h1>
+
+<h3>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h3>
+
+<p><a href="http://wiki.ruleml.org">RuleML</a> is a knowledge representation language developed by a non-profit organization RuleML Inc. RuleML is being used for sharing rule bases in XML and publishing them on the Web. It has broad coverage and is defined as an extensible family of sublanguages across various rule logics and platforms. RuleML consists of <a href="http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML">Deliberation RuleML</a> and <a href="http://wiki.ruleml.org/index.php/Specification_of_Reaction_RuleML">Reaction RuleML</a>. </p>
+
+<p>This project is aimed at implementing an XSLT 2.0 translator to convert <a href="http://www.slideshare.net/polibear/datalog-and-its-extensions-for-semantic-web-databases">Datalog+</a> <a href="http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML_1.01">Deliberation RuleML 1.01</a> in XML format to an equivalent representation in a subset of the (FOF) <a href="http://www.cs.miami.edu/%7Etptp/">TPTP</a> language.</p>
+
+<h3>
+<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use</h3>
+
+<ol>
+<li>Download the binary or source code from the <a href="https://github.com/EdmonL/RuleML2TPTP/releases">project releases</a>.</li>
+<li>If source code is downloaded, use ant to build by "ant jar" or "ant release". See "ant -projecthelp" for other ant targets.</li>
+<li>Execute by calling "java -jar /path/to/ruleml2tptp.jar -s &lt;source RuleML file&gt; -o &lt;output filename&gt;". See "java -jar /path/to/ruleml2tptp.jar -h" for full usage.</li>
+<li>Java SE 7 or higher is recommended.</li>
+<li>Saxon is used but dynamically, so saxon.jar can be removed and the local JAXP implementation will be used. Make sure, however, that the local implementation supports XSLT 2.0, or things will go wrong.</li>
+</ol>
+
+<h3>
+<a id="ruleml-examples" class="anchor" href="#ruleml-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>RuleML examples</h3>
+
+<p>Get RuleML examples from <a href="http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML_1.01#Examples">RuleML wiki</a> or <a href="http://deliberation.ruleml.org/1.01/exa/DatalogPlus/">here</a>.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">RuleML2TPTP maintained by <a href="https://github.com/EdmonL">EdmonL</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
