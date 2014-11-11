@@ -41,10 +41,18 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 
+/**
+ * This is the main class.
+ *
+ * @author Meng
+ */
 public class RuleML2TPTP {
+    // where to load the property file
     private static final String propertiesPath = "/resources/properties";
+    // the keys in the property file
     private static final String xsltNormalizerPathKey = "xslt.normalizer";
     private static final String xsltTranslatorPathKey = "xslt.translator";
+    // to display xslt properties
     private static final String xsltProperties = String.format(
           "<?xml version='1.0'?><xsl:stylesheet version='1.0' "
         + "xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>"
@@ -58,6 +66,7 @@ public class RuleML2TPTP {
         + "<xsl:value-of select=\"system-property('xsl:vendor-url')\"/>"
         + "</xsl:template></xsl:stylesheet>");
 
+    // exit codes
     private static final int EC_OPTION = 1;
     private static final int EC_SOURCE = 2;
     private static final int EC_OUTPUT = 3;
@@ -84,6 +93,7 @@ public class RuleML2TPTP {
                 tFactory = (SAXTransformerFactory)(SAXTransformerFactory
                         .newInstance());
             } else {
+                // if the factory class is provided
                 tFactory = (SAXTransformerFactory)(TransformerFactory
                         .newInstance(factoryClassName,
                             RuleML2TPTP.class.getClassLoader()));
@@ -102,6 +112,7 @@ public class RuleML2TPTP {
             System.exit(EC_FATAL);
         }
         if (cmd.hasOption('h')) {
+            // print help
             printUsage(options);
             return;
         }
@@ -199,9 +210,13 @@ public class RuleML2TPTP {
 
     private InputStream xsltNormalizer = null;
     private InputStream xsltTranslator = null;
+    // source reader
     private Reader sr = null;
+    // output writer
     private Writer ow = null;
+    // exit coed
     private int ec = 0;
+    // properties from the property file
     private Properties properties = null;
 
     public int getErrorCode() {
@@ -222,12 +237,14 @@ public class RuleML2TPTP {
         ow = getOutputWriter(cmd.getOptionValue('o'));
         Source source = new StreamSource(sr);
         Result result = new StreamResult(ow);
+        // the transformer to perform the final transformation
+        Transformer tf = null;
         try {
             if (xsltTranslator == null) {
                 assert xsltNormalizer != null;
-                tFactory.newTransformer(new StreamSource(new BufferedReader(
-                                new InputStreamReader(xsltNormalizer))))
-                    .transform(source, result);
+                tf = tFactory.newTransformer(new StreamSource(
+                            new BufferedReader(new InputStreamReader(
+                                    xsltNormalizer))));
             } else {
                 String commentPattern = cmd.getOptionValue('c');
                 String matchingFlags = cmd.getOptionValue('g');
@@ -238,8 +255,7 @@ public class RuleML2TPTP {
                     && (matchingFlags.indexOf('v') == -1);
                 matchingFlags = matchingFlags.replaceAll("v", "");
                 boolean useCrlf = cmd.hasOption('r');
-                Transformer translator = null;
-                Transformer tf = null;
+                Transformer translator = null; // to set params
                 if (xsltNormalizer == null) {
                     translator = tFactory.newTransformer(
                             new StreamSource(new BufferedReader(
@@ -250,8 +266,8 @@ public class RuleML2TPTP {
                             tFactory.newTemplates(new StreamSource(
                                     new BufferedReader(new InputStreamReader(
                                             xsltTranslator)))));
-                    th.setResult(result);
-                    result = new SAXResult(th);
+                    th.setResult(result); // connect to the result
+                    result = new SAXResult(th); // behave as the chained result
                     translator = th.getTransformer();
                     tf = tFactory.newTransformer(new StreamSource(
                                 new BufferedReader(new InputStreamReader(
@@ -267,8 +283,8 @@ public class RuleML2TPTP {
                 }
                 translator.setParameter("keep-comments", keepComments);
                 translator.setParameter("use-crlf", useCrlf);
-                tf.transform(source, result);
             }
+            tf.transform(source, result);
         } catch (TransformerConfigurationException ex) {
             ec = EC_FATAL;
             throw ex;
@@ -278,6 +294,7 @@ public class RuleML2TPTP {
         }
     }
 
+    // load XSLT files
     private void loadXslt(boolean doNormalization,
             boolean doTranslation) throws FileNotFoundException,
             IOException, TransformerConfigurationException {
@@ -300,9 +317,11 @@ public class RuleML2TPTP {
         }
     }
 
+    // load XSLT file by the key
     private InputStream loadXslt(String key) throws FileNotFoundException,
             IOException, TransformerConfigurationException {
         InputStream result = null;
+        // find the path from the system properties (maybe user customized)
         String path = System.getProperty(key);
         if (path != null) {
             try {
@@ -314,6 +333,7 @@ public class RuleML2TPTP {
             }
         }
         if (result == null) {
+            // find the path from the application properties
             loadProperties();
             path = properties.getProperty(key);
             if (path != null) {
@@ -330,7 +350,7 @@ public class RuleML2TPTP {
 
     private void loadProperties() throws IOException,
             TransformerConfigurationException {
-        if (properties != null) {
+        if (properties != null) { //do not load twice
             return;
         }
         properties = new Properties();
@@ -351,6 +371,7 @@ public class RuleML2TPTP {
         }
     }
 
+    // from the file or the standard input
     private Reader getSourceReader(
             String filename) throws FileNotFoundException {
         InputStream in = null;
@@ -369,6 +390,7 @@ public class RuleML2TPTP {
         return new BufferedReader(new InputStreamReader(in));
     }
 
+    // from the file or the standard output
     private Writer getOutputWriter(
             String filename) throws FileNotFoundException {
         OutputStream out = null;
@@ -387,6 +409,7 @@ public class RuleML2TPTP {
         return new BufferedWriter(new OutputStreamWriter(out));
     }
 
+    // close the closeable without throwing exceptions
     private void close(Closeable c) {
         if (c == null) {
             return;

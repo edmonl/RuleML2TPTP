@@ -51,11 +51,12 @@
 <!-- Indent. -->
 <xsl:template name="break-line">
   <xsl:param name="depth" required="yes" as="xs:integer"/>
+  <!-- Somtime we need to go backwards some spaces from the indention. -->
   <xsl:param name="retreat" select="0" required="no" as="xs:integer"/>
 
   <xsl:variable name="indent" as="xs:string *">
     <xsl:for-each select="1 to $depth">
-      <xsl:text>  </xsl:text>
+      <xsl:text>  </xsl:text> <!-- two spaces for every depth -->
     </xsl:for-each>
   </xsl:variable>
   <xsl:value-of select="$nl"/>
@@ -101,7 +102,7 @@
           <xsl:text>' is not valid in the target syntax.</xsl:text>
         </xsl:message>
       </xsl:if>
-      <!-- Escape \ and ' firstly. -->
+      <!-- Escape \ and ', then single quote. -->
       <xsl:value-of select='concat("&apos;",
         replace(replace(text(), "\\", "\\\\"), "&apos;", "\\&apos;"), "&apos;")'/>
     </xsl:otherwise>
