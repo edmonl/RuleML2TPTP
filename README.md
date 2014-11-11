@@ -1,7 +1,7 @@
 RuleML2TPTP
 =============================
 
-*This is an easy-use translator between two rule languages utilizing XSLT 2.0.*
+*This is an easy-use translator utilizing XSLT 2.0 between two rule languages.*
 
 ### Introduction
 
