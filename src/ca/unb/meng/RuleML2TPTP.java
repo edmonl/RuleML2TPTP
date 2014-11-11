@@ -134,6 +134,7 @@ public class RuleML2TPTP {
                         false, "take source as normalized"))
                 .addOption(new Option("nt", "no-translation", false,
                         "only normalize source and output")));
+        options.addOption("r", "use-crlf", false, "use CRLF");
         options.addOption(OptionBuilder
                 .hasArg()
                 .withArgName("class")
@@ -236,40 +237,37 @@ public class RuleML2TPTP {
                 boolean keepComments = cmd.hasOption('c')
                     && (matchingFlags.indexOf('v') == -1);
                 matchingFlags = matchingFlags.replaceAll("v", "");
+                boolean useCrlf = cmd.hasOption('r');
+                Transformer translator = null;
+                Transformer tf = null;
                 if (xsltNormalizer == null) {
-                    Transformer translator = tFactory.newTransformer(
+                    translator = tFactory.newTransformer(
                             new StreamSource(new BufferedReader(
                                     new InputStreamReader(xsltTranslator))));
-                    if (commentPattern != null && !commentPattern.isEmpty()) {
-                        translator.setParameter(
-                                "match-comments", commentPattern);
-                    }
-                    if (!matchingFlags.isEmpty()) {
-                        translator.setParameter(
-                                "matching-flags", matchingFlags);
-                    }
-                    translator.setParameter("keep-comments", keepComments);
-                    translator.transform(source, result);
+                    tf = translator;
                 } else {
                     TransformerHandler th = tFactory.newTransformerHandler(
                             tFactory.newTemplates(new StreamSource(
                                     new BufferedReader(new InputStreamReader(
                                             xsltTranslator)))));
                     th.setResult(result);
-                    Transformer translator = th.getTransformer();
-                    if (commentPattern != null && !commentPattern.isEmpty()) {
-                        translator.setParameter(
-                                "match-comments", commentPattern);
-                    }
-                    if (!matchingFlags.isEmpty()) {
-                        translator.setParameter(
-                                "matching-flags", matchingFlags);
-                    }
-                    translator.setParameter("keep-comments", keepComments);
-                    tFactory.newTransformer(new StreamSource(new BufferedReader(
-                                    new InputStreamReader(xsltNormalizer))))
-                        .transform(source, new SAXResult(th));
+                    result = new SAXResult(th);
+                    translator = th.getTransformer();
+                    tf = tFactory.newTransformer(new StreamSource(
+                                new BufferedReader(new InputStreamReader(
+                                        xsltNormalizer))));
                 }
+                if (commentPattern != null && !commentPattern.isEmpty()) {
+                    translator.setParameter(
+                            "match-comments", commentPattern);
+                }
+                if (!matchingFlags.isEmpty()) {
+                    translator.setParameter(
+                            "matching-flags", matchingFlags);
+                }
+                translator.setParameter("keep-comments", keepComments);
+                translator.setParameter("use-crlf", useCrlf);
+                tf.transform(source, result);
             }
         } catch (TransformerConfigurationException ex) {
             ec = EC_FATAL;

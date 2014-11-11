@@ -11,6 +11,8 @@
 <xsl:param name="matching-flags" select="''" as="xs:string" required="no"/>
 <!-- Keep or skip matched comments. -->
 <xsl:param name="keep-comments" select="false()" as="xs:boolean" required="no"/>
+<!-- Use CRLF instead of LF. -->
+<xsl:param name="use-crlf" select="false()" as="xs:boolean" required="no"/>
 
 <xsl:output method="text"/>
 <!-- We have to do the format ourselves. -->
@@ -35,7 +37,16 @@
 </xsl:template>
 
 <!-- Line break.  -->
-<xsl:variable name="nl" select="'&#xA;'" as="xs:string"/>
+<xsl:variable name="nl" as="xs:string">
+  <xsl:choose>
+    <xsl:when test="$use-crlf">
+      <xsl:text>&#xD;&#xA;</xsl:text>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:text>&#xA;</xsl:text>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:variable>
 
 <!-- Indent. -->
 <xsl:template name="break-line">
