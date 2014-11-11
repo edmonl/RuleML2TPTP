@@ -39,7 +39,7 @@
 
 <p><a href="http://wiki.ruleml.org">RuleML</a> is a knowledge representation language developed by a non-profit organization RuleML Inc. RuleML is being used for sharing rule bases in XML and publishing them on the Web. It has broad coverage and is defined as an extensible family of sublanguages across various rule logics and platforms. RuleML consists of <a href="http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML">Deliberation RuleML</a> and <a href="http://wiki.ruleml.org/index.php/Specification_of_Reaction_RuleML">Reaction RuleML</a>. </p>
 
-<p>This project is aimed at implementing an XSLT 2.0 translator to convert <a href="http://www.slideshare.net/polibear/datalog-and-its-extensions-for-semantic-web-databases">Datalog+</a> <a href="http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML_1.01">Deliberation RuleML 1.01</a> in XML format to an equivalent representation in a subset of the (FOF) <a href="http://www.cs.miami.edu/%7Etptp/">TPTP</a> language.</p>
+<p>This project is aimed at implementing an <a href="http://www.w3.org/TR/xslt20/">XSLT 2.0</a> translator to convert <a href="http://www.slideshare.net/polibear/datalog-and-its-extensions-for-semantic-web-databases">Datalog+</a> <a href="http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML_1.01">Deliberation RuleML 1.01</a> in XML format to an equivalent representation in a subset of the (FOF) <a href="http://www.cs.miami.edu/%7Etptp/">TPTP</a> language. See <a href="http://deliberation.ruleml.org/1.01/doc/datalogplus_min_normal/">here</a> for the normalized Datalog+ Deliberation RuleML 1.01 schema on which this project is based.</p>
 
 <h3>
 <a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use</h3>
@@ -50,6 +50,7 @@
 <li>Execute by calling "java -jar /path/to/ruleml2tptp.jar -s &lt;source RuleML file&gt; -o &lt;output filename&gt;". See "java -jar /path/to/ruleml2tptp.jar -h" for full usage.</li>
 <li>Java SE 7 or higher is recommended.</li>
 <li>Saxon is used but dynamically, so saxon.jar can be removed and the local JAXP implementation will be used. Make sure, however, that the local implementation supports XSLT 2.0, or things will go wrong.</li>
+<li>See the <a href="https://github.com/EdmonL/RuleML2TPTP/wiki">project wiki</a> for the other documentation.</li>
 </ol>
 
 <h3>
