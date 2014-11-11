@@ -9,16 +9,17 @@
   <property name="debug.suspend" value="n"/>
 
   <property name="main-class" value="ca.unb.meng.${ant.project.name}"/>
-  <property name="jar.file.basename" value="ruleml2tptp"/>
+  <property name="dist.file.basename" value="ruleml2tptp"/>
 
   <property name="src.dir" value="src"/>
   <property name="resources.dir.name" value="resources"/>
   <property name="build.dir" value="build"/>
   <property name="classes.dir" value="${build.dir}/classes"/>
   <property name="jar.dir" value="${build.dir}/jar"/>
-  <property name="jar.file" value="${jar.dir}/${jar.file.basename}.jar"/>
+  <property name="jar.file" value="${jar.dir}/${dist.file.basename}.jar"/>
   <property name="lib.dir" value="lib"/>
   <property name="doc.dir" value="doc"/>
+  <property name="dist.dir" value="release"/>
 
   <path id="lib.classpath">
     <fileset dir="${lib.dir}" includes="**/*.jar"/>
@@ -40,6 +41,7 @@
   <target name="clean-all" description="Clean more thoroughly.">
     <delete dir="${build.dir}"/>
     <delete dir="${doc.dir}"/>
+    <delete dir="${dist.dir}"/>
   </target>
 
   <target name="compile" description="Compile source code into class files.">
@@ -140,5 +142,18 @@
     </javadoc>
   </target>
   -->
+
+  <target name="release" depends="jar" description="Make release files.">
+    <input message="Enter the release version:" addproperty="release.version"/>
+    <property name="release.file.basename"
+      value="${dist.dir}/${dist.file.basename}_v${release.version}"/>
+    <tar destfile="${release.file.basename}.tar"
+      basedir="${jar.dir}" includes="*.jar"/>
+    <gzip src="${release.file.basename}.tar"
+      destfile="${release.file.basename}.tar.gz"/>
+    <zip destfile="${release.file.basename}.zip"
+      basedir="${jar.dir}" includes="*.jar"/>
+    <delete file="${release.file.basename}.tar"/>
+  </target>
 
 </project>
