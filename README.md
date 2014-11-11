@@ -14,7 +14,7 @@ This project was initiated as a course project in [UNB](http://www.unb.ca). Than
 ### Getting Started
 
 1. Download the binary or source code from the [project releases](https://github.com/EdmonL/RuleML2TPTP/releases).
-2. If the source code is downloaded, use ant to build by "ant jar" or "ant release". See "ant -projecthelp" for other ant targets.
+2. If the source code is downloaded, use ant to build by "ant jar". See "ant -projecthelp" for other ant targets.
 3. Translate a RuleML file by calling "java -jar /path/to/ruleml2tptp.jar -s &lt;source RuleML filename&gt; -o &lt;output filename&gt;". See "java -jar /path/to/ruleml2tptp.jar -h" for full usage.
 4. Java SE 7 or higher is recommended.
 5. Saxon is used dynamically, so saxon.jar can be removed and the local JAXP implementation will be used instead. Make sure, however, that the local implementation supports XSLT 2.0, or things will go wrong.
