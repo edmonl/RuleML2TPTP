@@ -23,12 +23,8 @@
   <xsl:if test="matches(., $match-comments, $matching-flags) = $keep-comments">
     <xsl:variable name="step-1"
       select="replace(., '(^[ \t]+)|([ \t]+$)', '', 'm')"/>
-    <xsl:variable name="step-2"
-      select="replace($step-1, '^-- ', '% ', 'm')"/>
-    <xsl:variable name="step-3"
-      select="replace($step-2, '^(-+)$', '%$1', 'm')"/>
     <xsl:variable name="final"
-      select="replace($step-3, '^([^%\r\n].*)$', '% $1', 'm')"/>
+      select="replace($step-1, '^([^%\r\n].*)$', '% $1', 'm')"/>
     <xsl:value-of select="$final"/>
     <xsl:if test="not(matches($final, '\n$'))">
       <xsl:value-of select="$nl"/>
