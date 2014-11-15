@@ -162,7 +162,7 @@ public class RuleML2TPTP {
                 .hasArg()
                 .withArgName("flags")
                 .withDescription("flags following the specification of XPath "
-                    + "except for flag \"v\" (see NOTES below)")
+                    + "except for flag 'v' (see NOTES below)")
                 .withLongOpt("comment-matching-flags")
                 .create('g'));
         options.addOption(OptionBuilder
