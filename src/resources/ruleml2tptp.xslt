@@ -6,11 +6,11 @@
   xmlns:r="http://ruleml.org/spec">
 
 <!-- The regular expression to match against comments. -->
-<xsl:param name="match-comments" select="'.*'" as="xs:string" required="no"/>
+<xsl:param name="comment-pattern" select="''" as="xs:string" required="no"/>
 <!-- The flags when matching against comments. -->
-<xsl:param name="matching-flags" select="''" as="xs:string" required="no"/>
+<xsl:param name="comment-matching-flags" select="''" as="xs:string" required="no"/>
 <!-- Keep or skip matched comments. -->
-<xsl:param name="keep-comments" select="false()" as="xs:boolean" required="no"/>
+<xsl:param name="keep-comments" select="true()" as="xs:boolean" required="no"/>
 <!-- Use CRLF instead of LF. -->
 <xsl:param name="use-crlf" select="false()" as="xs:boolean" required="no"/>
 
@@ -20,16 +20,36 @@
 
 <!-- Comments. -->
 <xsl:template match="comment()" mode="#all">
-  <xsl:if test="matches(., $match-comments, $matching-flags) = $keep-comments">
-    <xsl:variable name="step-1"
-      select="replace(., '(^[ \t]+)|([ \t]+$)', '', 'm')"/>
-    <xsl:variable name="final"
-      select="replace($step-1, '^([^%\r\n].*)$', '% $1', 'm')"/>
-    <xsl:value-of select="$final"/>
-    <xsl:if test="not(matches($final, '\n$'))">
-      <xsl:value-of select="$nl"/>
-    </xsl:if>
-  </xsl:if>
+  <xsl:choose>
+    <xsl:when test="$comment-pattern = ''">
+      <xsl:if test="$keep-comments">
+        <xsl:call-template name="convert-comment">
+          <xsl:with-param name="comment" select="."/>
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:when>
+    <xsl:when test="matches(., $comment-pattern, $comment-matching-flags) = $keep-comments">
+      <xsl:call-template name="convert-comment">
+        <xsl:with-param name="comment" select="."/>
+      </xsl:call-template>
+    </xsl:when>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template name="convert-comment">
+  <xsl:param name="comment" as="xs:string" required="yes"/>
+  <!-- Trim lines. -->
+  <xsl:variable name="step1"
+    select="replace($comment, '(^[ \t]+)|([ \t]+$)', '', 'm')"/>
+  <!-- Trim blank lines. -->
+  <xsl:variable name="step2"
+    select="replace($step1, '(^\r*\n)|(\r*\n$)', '')"/>
+  <!-- Insert '% '. -->
+  <xsl:variable name="final"
+    select="replace($step2, '^([^%\r\n].*)$', '% $1', 'm')"/>
+  <!-- Switch to a new line after the comment. -->
+  <xsl:value-of select="$final"/>
+  <xsl:value-of select="$nl"/>
 </xsl:template>
 
 <!-- Line break.  -->
