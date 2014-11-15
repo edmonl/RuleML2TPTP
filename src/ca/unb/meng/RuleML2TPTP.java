@@ -153,18 +153,17 @@ public class RuleML2TPTP {
                 .withLongOpt("transformer-factory")
                 .create('t'));
         options.addOption(OptionBuilder
-                .hasOptionalArg()
+                .hasArg()
                 .withArgName("pattern")
-                .withDescription("keep comments matching given pattern "
-                   + "or any pattern if pattern is omitted or empty")
-                .withLongOpt("keep-comments")
+                .withDescription("use give pattern to match comments")
+                .withLongOpt("comment-pattern")
                 .create('c'));
         options.addOption(OptionBuilder
                 .hasArg()
                 .withArgName("flags")
                 .withDescription("flags following the specification of XPath "
-                    + "except for flag v (see NOTES below)")
-                .withLongOpt("matching-flags")
+                    + "except for flag \"v\" (see NOTES below)")
+                .withLongOpt("comment-matching-flags")
                 .create('g'));
         options.addOption(OptionBuilder
                 .hasArg()
@@ -182,12 +181,13 @@ public class RuleML2TPTP {
     private static void printUsage(Options options) {
         new HelpFormatter().printHelp("java -jar ruleml2tptp.jar",
                  null, options, String.format("%nNOTES%n"
-                    + "If '-s' or '-o' is omitted, the standard input or "
-                    + "output will be used accordingly.%n"
-                    + "If '-h' is used, "
-                    + "no XML transformation will be performed.%n"
-                    + "Flag v means the matching behavior is reverted, "
-                    + "so comments DO NOT match the given pattern are kept. "
+                    + "If '-s' or '-o' is omitted, the standard input or output will be used accordingly.%n"
+                    + "If '-h' is used, no XML transformation will be performed.%n"
+                    + "By default, all the comments in the source will be kept in the output. "
+                    + "Use '-c' to switch to keep only those matching the given pattern. "
+                    + "An empty pattern has no effect. "
+                    + "Flag \"v\" reverts the behavior by keeping those not matching the pattern, "
+                    + "or by ignoring all the comments if no or empty pattern is given."
                     ),
                 true);
         System.out.println();
@@ -246,15 +246,19 @@ public class RuleML2TPTP {
                             new BufferedReader(new InputStreamReader(
                                     xsltNormalizer))));
             } else {
+                // parse translator parameters
                 String commentPattern = cmd.getOptionValue('c');
-                String matchingFlags = cmd.getOptionValue('g');
-                if (matchingFlags == null) {
-                    matchingFlags = "";
+                if (commentPattern == null) {
+                    commentPattern = "";
                 }
-                boolean keepComments = cmd.hasOption('c')
-                    && (matchingFlags.indexOf('v') == -1);
-                matchingFlags = matchingFlags.replaceAll("v", "");
+                String commentMatchingFlags = cmd.getOptionValue('g');
+                if (commentMatchingFlags == null) {
+                    commentMatchingFlags = "";
+                }
+                boolean keepComments = (commentMatchingFlags.indexOf('v') == -1);
+                commentMatchingFlags = commentMatchingFlags.replaceAll("v", "");
                 boolean useCrlf = cmd.hasOption('r');
+
                 Transformer translator = null; // to set params
                 if (xsltNormalizer == null) {
                     translator = tFactory.newTransformer(
@@ -273,14 +277,8 @@ public class RuleML2TPTP {
                                 new BufferedReader(new InputStreamReader(
                                         xsltNormalizer))));
                 }
-                if (commentPattern != null && !commentPattern.isEmpty()) {
-                    translator.setParameter(
-                            "match-comments", commentPattern);
-                }
-                if (!matchingFlags.isEmpty()) {
-                    translator.setParameter(
-                            "matching-flags", matchingFlags);
-                }
+                translator.setParameter("comment-pattern", commentPattern);
+                translator.setParameter("comment-matching-flags", commentMatchingFlags);
                 translator.setParameter("keep-comments", keepComments);
                 translator.setParameter("use-crlf", useCrlf);
             }
