@@ -9,7 +9,7 @@ RuleML2TPTP
 
 This project is aimed at implementing an [XSLT 2.0](http://www.w3.org/TR/xslt20/) translator to convert [Datalog+](http://www.slideshare.net/polibear/datalog-and-its-extensions-for-semantic-web-databases) [Deliberation RuleML 1.01](http://wiki.ruleml.org/index.php/Specification_of_Deliberation_RuleML_1.01) in XML format to an equivalent representation in a subset of the (FOF) [TPTP](http://www.cs.miami.edu/~tptp/) language. See [here](http://deliberation.ruleml.org/1.01/doc/datalogplus_min_normal/) for the normalized Datalog+ Deliberation RuleML 1.01 schema on which this project is based.
 
-This project was initiated as a course project in [UNB](http://www.unb.ca). Thanks to [Prof. Boley](https://github.com/HaroldBoley) and advisor [Tara](https://github.com/greenTara) for their instruction in semantic web techniques!
+This project was initiated as a [course project](http://www.cs.unb.ca/~boley/cs6795swt/fall2014projects.html) (Team 5) in [Semantic Web Techniques](http://www.cs.unb.ca/~boley/cs6795swt/) in [UNB](http://www.unb.ca). Thanks to [Prof. Boley](http://www.cs.unb.ca/~boley/) and advisor [Tara](http://www.alt2is.com/) for their instruction in semantic web techniques! Here are the [slides](http://edmonl.github.io/RuleML2TPTP/) and [examples](http://edmonl.github.io/RuleML2TPTP/) that were used for a presentation in class.
 
 ### Getting Started
 
