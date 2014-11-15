@@ -184,7 +184,7 @@ public class RuleML2TPTP {
                     + "If '-s' or '-o' is omitted, the standard input or output will be used accordingly.%n"
                     + "If '-h' is used, no XML transformation will be performed.%n"
                     + "By default, all the comments in the source will be kept in the output. "
-                    + "'-c' can switch to keep only those matching the given pattern. "
+                    + "Use '-c' to switch to keep only those matching the given pattern. "
                     + "An empty pattern has no effect. "
                     + "Flag \"v\" reverts the behavior by keeping those not matching the pattern, "
                     + "or by ignoring all the comments if no or empty pattern is given."
