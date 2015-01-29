@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<RuleML xmlns="http://ruleml.org/spec">
+  <Assert>
+    <Atom>
+      <Rel>testTwoArgs</Rel>
+      <Ind>ruleml</Ind>
+      <Ind>org</Ind>
+    </Atom>
+  </Assert>
+  <Query>
+    <Atom>
+      <Rel>testZeroArgs</Rel>
+    </Atom>
+  </Query>
+</RuleML>

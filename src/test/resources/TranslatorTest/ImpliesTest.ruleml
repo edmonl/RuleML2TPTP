@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<RuleML xmlns="http://ruleml.org/spec">
+  <Query>
+    <Implies>
+      <Atom>
+        <Rel>testNotNested</Rel>
+        <Ind>ruleml</Ind>
+      </Atom>
+      <Atom>
+        <Rel>foo</Rel>
+        <Ind>ruleml</Ind>
+      </Atom>
+    </Implies>
+  </Query>
+  <Assert>
+    <Forall>
+      <Var>X</Var>
+      <Implies>
+        <Atom>
+          <Rel>testNested</Rel>
+          <Var>X</Var>
+        </Atom>
+        <Atom>
+          <Rel>foo</Rel>
+          <Var>X</Var>
+        </Atom>
+      </Implies>
+    </Forall>
+  </Assert>
+</RuleML>
