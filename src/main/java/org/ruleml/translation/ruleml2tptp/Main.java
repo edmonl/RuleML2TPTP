@@ -5,6 +5,8 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
@@ -50,6 +52,7 @@ public class Main {
     private List<String> input;
 
     private static final int EC_GENERAL = 1;
+    private static final int EC_TRANSFORM = 2;
 
     public static void main(String args[]) {
         final Main appMain = new Main();
@@ -93,6 +96,20 @@ public class Main {
     }
 
     private void run(SAXTransformerFactory transFactory) {
+        final Translator translator = new Translator(transFactory);
+        translator.loadTemplates();
+        try {
+            translator.translate(new StreamSource(new FileInputStream(input.get(0))),
+                    new StreamResult(output));
+        } catch (TransformerException ex) {
+            System.err.println(ex.getMessageAndLocation());
+            System.err.println();
+            System.exit(EC_TRANSFORM);
+        } catch (FileNotFoundException ex) {
+            System.err.println(ex.getLocalizedMessage());
+            System.err.println();
+            System.exit(EC_TRANSFORM);
+        }
     }
 
 }
