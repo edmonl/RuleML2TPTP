@@ -268,7 +268,7 @@
   </xsl:choose>
 </xsl:template>
 
-<xsl:template match="r:Atom">
+<xsl:template match="r:Atom | r:Expr">
   <xsl:apply-templates select="r:op"/>
   <!-- sorted args -->
   <xsl:for-each select="r:arg">
@@ -280,7 +280,7 @@
         <xsl:text>(</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:apply-templates select="r:Ind | r:Var"/>
+    <xsl:apply-templates select="r:Ind | r:Var | r:Expr"/>
     <xsl:if test="not(following-sibling::r:arg)">
       <xsl:text>)</xsl:text>
     </xsl:if>

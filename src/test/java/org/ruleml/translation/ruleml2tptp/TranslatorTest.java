@@ -46,7 +46,8 @@ public class TranslatorTest
             "Exists",
             "Equal",
             "And",
-            "Or"
+            "Or",
+            "Expr"
         };
     }
 

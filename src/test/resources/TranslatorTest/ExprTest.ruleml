@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<RuleML xmlns="http://ruleml.org/spec">
+  <Assert>
+    <Forall>
+      <Var>X</Var>
+      <Atom>
+        <Rel>testNested</Rel>
+        <Expr>
+          <Fun>testMoreNested</Fun>
+          <Ind>ruleml</Ind>
+          <Expr>
+            <Fun>testMoreAndMoreNested</Fun>
+            <Var>X</Var>
+          </Expr>
+        </Expr>
+        <Ind>ruleml</Ind>
+      </Atom>
+    </Forall>
+  </Assert>
+  <Query>
+    <Expr>
+      <Fun>testZeroArgs</Fun>
+    </Expr>
+    <Expr>
+      <Fun>testOneArg</Fun>
+      <Ind>ruleml</Ind>
+    </Expr>
+    <Exists>
+      <Var>X</Var>
+      <Expr>
+        <Fun>testTwoArgs</Fun>
+        <Ind>one</Ind>
+        <Var>X</Var>
+      </Expr>
+    </Exists>
+  </Query>
+</RuleML>
