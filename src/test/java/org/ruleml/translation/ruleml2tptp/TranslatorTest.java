@@ -42,7 +42,11 @@ public class TranslatorTest
         return new Object[] {
             "Atom",
             "Implies",
-            "Forall"
+            "Forall",
+            "Exists",
+            "Equal",
+            "And",
+            "Or"
         };
     }
 

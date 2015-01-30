@@ -48,27 +48,27 @@
 </xsl:template>
 
 <xsl:template match="/">
-  <xsl:apply-templates select="r:* | comment()"/>
+  <xsl:apply-templates select="r:RuleML | comment()"/>
 </xsl:template>
 
 <xsl:template match="r:RuleML">
-  <xsl:apply-templates select="r:* | comment()"/>
+  <xsl:apply-templates select="r:act | comment()"/>
 </xsl:template>
 
 <xsl:template match="r:act">
-  <xsl:apply-templates select="r:* | comment()">
+  <xsl:apply-templates select="r:Assert | r:Query | comment()">
     <xsl:with-param name="act-index" select="@index" tunnel="yes"/>
   </xsl:apply-templates>
 </xsl:template>
 
 <xsl:template match="r:Assert">
-  <xsl:apply-templates select="r:* | comment()" mode="fof-formula">
+  <xsl:apply-templates select="r:formula | comment()" mode="fof-formula">
     <xsl:with-param name="formula-type" select="local-name()"/>
   </xsl:apply-templates>
 </xsl:template>
 
 <xsl:template match="r:Query">
-  <xsl:apply-templates select="r:* | comment()" mode="fof-formula">
+  <xsl:apply-templates select="r:formula | comment()" mode="fof-formula">
     <xsl:with-param name="formula-type" select="local-name()"/>
   </xsl:apply-templates>
 </xsl:template>
@@ -213,59 +213,41 @@
   <xsl:apply-templates select="r:right"/>
 </xsl:template>
 
-<xsl:template match = "r:And">
-  <xsl:param name="depth" required="yes" as="xs:integer" tunnel="yes"/>
-  <xsl:param name="line-breaking" required="yes" as="xs:boolean" tunnel="yes"/>
-
-  <xsl:choose>
-    <xsl:when test="r:*">
-
-      <xsl:if test="$line-breaking">
-        <xsl:call-template name="break-line">
-          <xsl:with-param name="depth" select="$depth"/>
-        </xsl:call-template>
-      </xsl:if>
-      <xsl:text>( </xsl:text>
-      <xsl:for-each select="r:*">
-        <xsl:if test="preceding-sibling::r:*">
-          <xsl:call-template name="break-line">
-            <xsl:with-param name="depth" select="$depth"/>
-          </xsl:call-template>
-          <xsl:text>&amp; </xsl:text>
-        </xsl:if>
-        <xsl:apply-templates>
-          <xsl:with-param name="depth" select="$depth + 1" tunnel="yes"/>
-          <xsl:with-param name="line-breaking" select="false()" tunnel="yes"/>
-        </xsl:apply-templates>
-      </xsl:for-each>
-      <xsl:text> )</xsl:text>
-
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:text>$true</xsl:text>
-    </xsl:otherwise>
-  </xsl:choose>
+<xsl:template match="r:And">
+  <xsl:call-template name="associated">
+    <xsl:with-param name="connective" select="'&amp;'"/>
+    <xsl:with-param name="empty-form" select="'$true'"/>
+  </xsl:call-template>
 </xsl:template>
 
-<xsl:template match = "r:Or">
+<xsl:template match="r:Or">
+  <xsl:call-template name="associated">
+    <xsl:with-param name="connective" select="'|'"/>
+    <xsl:with-param name="empty-form" select="'$false'"/>
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template name="associated">
   <xsl:param name="depth" required="yes" as="xs:integer" tunnel="yes"/>
   <xsl:param name="line-breaking" required="yes" as="xs:boolean" tunnel="yes"/>
+  <xsl:param name="connective" required="yes" as="xs:string"/>
+  <xsl:param name="empty-form" required="yes" as="xs:string"/>
 
   <xsl:choose>
-    <xsl:when test="r:*">
+    <xsl:when test="r:formula[2]">
       <xsl:if test="$line-breaking">
         <xsl:call-template name="break-line">
           <xsl:with-param name="depth" select="$depth"/>
         </xsl:call-template>
       </xsl:if>
-
       <xsl:text>( </xsl:text>
-      <xsl:for-each select="r:*">
-        <xsl:if test="preceding-sibling::r:*">
+      <xsl:for-each select="r:formula">
+        <xsl:if test="preceding-sibling::r:formula">
           <xsl:call-template name="break-line">
             <xsl:with-param name="depth" select="$depth"/>
           </xsl:call-template>
-          <xsl:text>| </xsl:text>
+          <xsl:value-of select="$connective"/>
+          <xsl:text> </xsl:text>
         </xsl:if>
         <xsl:apply-templates>
           <xsl:with-param name="depth" select="$depth + 1" tunnel="yes"/>
@@ -274,8 +256,14 @@
       </xsl:for-each>
       <xsl:text> )</xsl:text>
     </xsl:when>
+    <xsl:when test="r:formula">
+      <xsl:apply-templates>
+        <xsl:with-param name="depth" select="$depth + 1" tunnel="yes"/>
+        <xsl:with-param name="line-breaking" select="false()" tunnel="yes"/>
+      </xsl:apply-templates>
+    </xsl:when>
     <xsl:otherwise>
-      <xsl:text>$false</xsl:text>
+      <xsl:value-of select="$empty-form"/>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
@@ -292,7 +280,7 @@
         <xsl:text>(</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:apply-templates/>
+    <xsl:apply-templates select="r:Ind | r:Var"/>
     <xsl:if test="not(following-sibling::r:arg)">
       <xsl:text>)</xsl:text>
     </xsl:if>
@@ -338,7 +326,7 @@
     <xsl:if test="preceding-sibling::r:declare">
       <xsl:text>,</xsl:text>
     </xsl:if>
-    <xsl:apply-templates/>
+    <xsl:apply-templates select="r:Var"/>
   </xsl:for-each>
 </xsl:template>
 

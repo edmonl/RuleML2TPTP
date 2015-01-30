@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<RuleML xmlns="http://ruleml.org/spec">
+  <Assert>
+    <Equal>
+      <Ind>ruleml</Ind>
+      <Ind>org</Ind>
+    </Equal>
+  </Assert>
+  <Query>
+    <Forall>
+      <Var>X</Var>
+      <Equal>
+        <Var>X</Var>
+        <Ind>ruleml</Ind>
+      </Equal>
+    </Forall>
+  </Query>
+</RuleML>

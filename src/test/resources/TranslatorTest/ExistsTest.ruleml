@@ -2,7 +2,7 @@
 
 <RuleML xmlns="http://ruleml.org/spec">
   <Assert>
-    <Forall>
+    <Exists>
       <Var>X</Var>
       <Var>Y</Var>
       <Atom>
@@ -10,12 +10,12 @@
         <Var>X</Var>
         <Var>Y</Var>
       </Atom>
-    </Forall>
-    <Forall>
+    </Exists>
+    <Exists>
       <Var>X</Var>
       <Implies>
         <Atom>
-          <Rel>testLeadingLineBreaking</Rel>
+          <Rel>testLineBreaking</Rel>
           <Var>X</Var>
         </Atom>
         <Atom>
@@ -24,19 +24,19 @@
           <Ind>constant</Ind>
         </Atom>
       </Implies>
-    </Forall>
+    </Exists>
   </Assert>
   <Query>
-    <Exists>
+    <Forall>
       <Var>X</Var>
-      <Forall>
+      <Exists>
         <Var>Y</Var>
         <Atom>
           <Rel>testNested</Rel>
           <Var>X</Var>
           <Var>Y</Var>
         </Atom>
-      </Forall>
-    </Exists>
+      </Exists>
+    </Forall>
   </Query>
 </RuleML>

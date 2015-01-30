@@ -1,12 +1,12 @@
 fof(act1_formula1,axiom,(
-    ! [X,Y] : testTwoVars(X,Y)
+    ? [X,Y] : testTwoVars(X,Y)
 )).
 fof(act1_formula2,axiom,(
-    ! [X] :
-      ( testLeadingLineBreaking(X)
+    ? [X] :
+      ( testLineBreaking(X)
      => testNotNested(X,constant) )
 )).
 fof(act2_formula1,conjecture,(
-    ? [X] :
-    ! [Y] : testNested(X,Y)
+    ! [X] :
+    ? [Y] : testNested(X,Y)
 )).
