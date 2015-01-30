@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<RuleML xmlns="http://ruleml.org/spec">
+  <Assert>
+    <Forall>
+      <Var>X</Var>
+      <Var>Y</Var>
+      <Atom>
+        <Rel>testTwoVars</Rel>
+        <Var>X</Var>
+        <Var>Y</Var>
+      </Atom>
+    </Forall>
+    <Forall>
+      <Var>X</Var>
+      <Implies>
+        <Atom>
+          <Rel>testLeadingLineBreaking</Rel>
+          <Var>X</Var>
+        </Atom>
+        <Atom>
+          <Rel>testNotNested</Rel>
+          <Var>X</Var>
+          <Ind>constant</Ind>
+        </Atom>
+      </Implies>
+    </Forall>
+  </Assert>
+  <Query>
+    <Exists>
+      <Var>X</Var>
+      <Forall>
+        <Var>Y</Var>
+        <Atom>
+          <Rel>testNested</Rel>
+          <Var>X</Var>
+          <Var>Y</Var>
+        </Atom>
+      </Forall>
+    </Exists>
+  </Query>
+</RuleML>

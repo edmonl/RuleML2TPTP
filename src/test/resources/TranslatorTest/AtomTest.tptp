@@ -1,0 +1,6 @@
+fof(act1_formula1,axiom,(
+    testTwoArgs(ruleml,org)
+)).
+fof(act2_formula1,conjecture,(
+    testZeroArgs
+)).

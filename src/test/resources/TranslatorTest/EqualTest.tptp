@@ -1,0 +1,6 @@
+fof(act1_formula1,axiom,(
+    ruleml = org
+)).
+fof(act2_formula1,conjecture,(
+    ! [X] : X = ruleml
+)).

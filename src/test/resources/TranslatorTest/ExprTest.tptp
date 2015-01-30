@@ -1,0 +1,12 @@
+fof(act1_formula1,axiom,(
+    ! [X] : testNested(testMoreNested(ruleml,testMoreAndMoreNested(X)),ruleml)
+)).
+fof(act2_formula1,conjecture,(
+    testZeroArgs
+)).
+fof(act2_formula2,conjecture,(
+    testOneArg(ruleml)
+)).
+fof(act2_formula3,conjecture,(
+    ? [X] : testTwoArgs(one,X)
+)).
